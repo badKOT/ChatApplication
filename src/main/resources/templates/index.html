@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spring Boot Chat Application</title>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+<noscript>
+    <h2>Sorry! Your browser doesn't support Javascript</h2>
+</noscript>
+
+<div id="username-page">
+    <div class="username-page-container">
+
+        <h1 class="title">Type your username to enter the Chatroom</h1>
+        <form id="username-form" name="usernameForm">
+            <div class="form-group">
+                <input type="text" id="name" placeholder="Username" autocomplete="off" class="form-control">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="accent username-submit">Start Chatting</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<div id="home-page" class="hidden">
+    <div id="MainHeader" class="header"></div>
+    <div class="chat-list">
+        <div style="position:relative;"></div>
+    </div>
+</div>
+
+<script src="/js/main.js" type="module"></script>
+</body>
+</html>
