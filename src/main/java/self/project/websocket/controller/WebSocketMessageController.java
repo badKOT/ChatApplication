@@ -9,28 +9,21 @@ import org.springframework.stereotype.Controller;
 import self.project.websocket.dto.MessageDto;
 import self.project.websocket.mapper.DtoAccountMapper;
 import self.project.websocket.model.Account;
-import self.project.websocket.model.Chat;
 import self.project.websocket.service.AccountService;
-import self.project.websocket.service.ChatService;
-import self.project.websocket.service.MessageService;
+import self.project.websocket.service.DelegatingService;
 
 @Controller
 @RequiredArgsConstructor
 public class WebSocketMessageController {
 
-    private final MessageService messageService;
     private final AccountService accountService;
-    private final ChatService chatService;
+    private final DelegatingService delegatingService;
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/public")
     public MessageDto sendMessage(@Payload MessageDto messageDto) {
         System.out.println("Got the request to send the message: " + messageDto);
-
-        Account account = accountService.findByUsername(messageDto.getSender());
-        Chat chat = chatService.findById(1L); // TODO() proper chat mapping
-        messageService.save(messageDto, account, chat);
-
+        delegatingService.saveMessage(messageDto); // TODO() separate channels for different chats
         return messageDto;
     }
 

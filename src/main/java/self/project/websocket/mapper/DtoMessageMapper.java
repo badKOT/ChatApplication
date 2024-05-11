@@ -13,5 +13,7 @@ public interface DtoMessageMapper {
     @Mapping(target = "content", source = "text")
     @Mapping(target = "sender", source = "sender.username")
     @Mapping(target = "type", expression = "java(self.project.websocket.dto.MessageType.CHAT)")
+    @Mapping(target = "sent", source = "sent")
+    @Mapping(target = "chatId", source = "chat.id")
     MessageDto toDto(Message message);
 }

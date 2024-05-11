@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "messages")
@@ -30,7 +30,7 @@ public class Message {
     @Column(nullable = false)
     private String text;
     @Column(nullable = false)
-    private LocalDateTime sent;
+    private Instant sent;
 
     @ManyToOne
     @JoinColumn(name = "account_id", referencedColumnName = "id")

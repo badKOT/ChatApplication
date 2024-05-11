@@ -8,7 +8,6 @@ import self.project.websocket.model.Chat;
 import self.project.websocket.model.Message;
 import self.project.websocket.repository.MessageRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -16,12 +15,8 @@ import java.util.List;
 public class MessageService {
     private final MessageRepository repository;
 
-    public void save(Message message) {
-        repository.save(message);
-    }
-
     public void save(MessageDto messageDto, Account account, Chat chat) {
-        repository.save(new Message(null, messageDto.getContent(), LocalDateTime.now(), account, chat));
+        repository.save(new Message(null, messageDto.getContent(), messageDto.getSent(), account, chat));
     }
 
     public List<Message> findByChat(Long chatId) {

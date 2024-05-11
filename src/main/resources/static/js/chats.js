@@ -1,13 +1,18 @@
 'use strict';
 
-import {getAvatarColor} from "./main.js";
-
 const messageForm = document.querySelector('#messageForm');
 const messageInput = document.querySelector('#message');
 const messageArea = document.querySelector('#messageArea');
 const connectingElement = document.querySelector('.connecting');
 const chatHeader = document.querySelector('.chat-header');
+const colors = [
+    '#2196F3', '#32c787', '#00BCD4', '#ff5652',
+    '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
+];
+
 messageForm.addEventListener('submit', sendMessage, true);
+chatInfo = JSON.parse(chatInfo);
+
 let stompClient = null;
 connect();
 
@@ -43,7 +48,7 @@ function onConnect() {
     }
 }
 
-function onMessageReceived(payload, removeHeaders = true) {
+function onMessageReceived(payload, removeHeaders = true) { // TODO() чаты пересекаются. fix it
     const message = removeHeaders ? JSON.parse(payload.body) : payload;
 
     let messageElement = document.createElement('li');
@@ -92,7 +97,9 @@ function sendMessage(event) {
         const chatMessage = {
             sender: username,
             content: messageContent,
-            type: 'CHAT'
+            type: 'CHAT',
+            sent: new Date(Date.now()).toISOString(),
+            chatId: chatInfo.chat.id
         };
         stompClient.send(
             '/app/chat.sendMessage',
@@ -102,4 +109,13 @@ function sendMessage(event) {
         messageInput.value = '';
     }
     event.preventDefault();
+}
+
+function getAvatarColor(messageSender) {
+    let hash = 0;
+    for (let i = 0; i < messageSender.length; i++) {
+        hash = 31 * hash + messageSender.charCodeAt(i);
+    }
+    const index = Math.abs(hash % colors.length);
+    return colors[index];
 }

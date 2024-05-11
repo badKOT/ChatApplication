@@ -1,29 +1,18 @@
 'use strict';
 
-const usernamePage = document.querySelector('#username-page');
-const homePage = document.querySelector('#home-page');
-const usernameForm = document.querySelector('#username-form');
 const chatListElement = document.querySelector('.chat-list div');
-if (usernameForm) {
-    usernameForm.addEventListener('submit', loadChatList, true);
-}
 
 const colors = [
     '#2196F3', '#32c787', '#00BCD4', '#ff5652',
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
 ];
 
-function loadChatList(event) {
+function loadChatList() {
     fetchChatList().then(payload => {
         for (let i = 0; i < payload.length; i++) {
             onChatReceived(payload[i], i);
         }
-    })
-
-    usernamePage.classList.add('hidden');
-    homePage.classList.remove('hidden');
-
-    event.preventDefault();
+    });
 }
 
 function onChatReceived(chat, shift) {
@@ -68,11 +57,15 @@ const fetchChatList = async () => {
     return await response.json();
 }
 
-export function getAvatarColor(messageSender) {
+function getAvatarColor(messageSender) {
     let hash = 0;
     for (let i = 0; i < messageSender.length; i++) {
         hash = 31 * hash + messageSender.charCodeAt(i);
     }
     const index = Math.abs(hash % colors.length);
     return colors[index];
+}
+
+if (chatListElement) {
+    loadChatList();
 }

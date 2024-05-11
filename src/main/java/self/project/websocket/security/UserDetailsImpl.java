@@ -1,12 +1,18 @@
 package self.project.websocket.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import self.project.websocket.model.Account;
 
 import java.util.Collection;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
+
+    private final Account account;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
@@ -14,31 +20,31 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return account.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return account.getUsername();
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }
