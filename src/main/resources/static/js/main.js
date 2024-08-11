@@ -7,8 +7,8 @@ const colors = [
     '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
 ];
 
-function loadChatList() {
-    fetchChatList().then(payload => {
+function loadChatList(userId) {
+    fetchChatList(userId).then(payload => {
         for (let i = 0; i < payload.length; i++) {
             onChatReceived(payload[i], i);
         }
@@ -52,8 +52,8 @@ function onChatReceived(chat, shift) {
     chatListElement.appendChild(chatContainer);
 }
 
-const fetchChatList = async () => {
-    const response = await fetch('http://localhost:8080/fetch/chatList');
+const fetchChatList = async (userId) => {
+    const response = await fetch('http://localhost:8080/fetch/chatList/' + userId);
     return await response.json();
 }
 
@@ -66,6 +66,8 @@ function getAvatarColor(messageSender) {
     return colors[index];
 }
 
-if (chatListElement) {
-    loadChatList();
-}
+document.addEventListener("DOMContentLoaded", function() {
+    if (chatListElement && userId) {
+        loadChatList(userId);
+    }
+});

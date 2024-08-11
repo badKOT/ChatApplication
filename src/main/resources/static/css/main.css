@@ -91,6 +91,26 @@ button.accent {
     color: #fff;
 }
 
+.add-user-form-holder {
+    position: relative;
+    float: right;
+}
+
+.notification {
+    display: block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #c5e1b2;
+    opacity: 0;
+    color: black;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    transition-duration: .5s;
+    transition-property: opacity;
+}
+
 #username-page {
     text-align: center;
 }
@@ -278,7 +298,7 @@ button.accent {
 
 #chat-page ul li {
     line-height: 1.5rem;
-    padding: 10px 20px;
+    padding: 10px 0;
     margin: 0;
     border-bottom: 1px solid #f4f4f4;
 }
@@ -300,16 +320,14 @@ button.accent {
 }
 
 #chat-page .chat-message {
-    padding-left: 68px;
     position: relative;
+    display: flex;
 }
 
 #chat-page .chat-message i {
-    position: absolute;
     width: 42px;
     height: 42px;
     overflow: hidden;
-    left: 10px;
     display: inline-block;
     vertical-align: middle;
     font-size: 18px;
@@ -321,13 +339,33 @@ button.accent {
     text-transform: uppercase;
 }
 
-#chat-page .chat-message span {
+.message-wrapper span {
     color: #333;
     font-weight: 600;
+    margin-bottom: 8px;
 }
 
-#chat-page .chat-message p {
+.message-wrapper p {
     color: #43464b;
+    word-wrap: break-word;
+    width: 100%;
+    flex-grow: 1;
+}
+
+.message-wrapper .message-time {
+    color: #999;
+    font-size: 12px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.message-wrapper {
+    margin-left: 16px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 #messageForm .input-group input {
@@ -343,7 +381,9 @@ button.accent {
 }
 
 .chat-header {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 15px;
     border-bottom: 1px solid #ececec;
 }
@@ -351,6 +391,8 @@ button.accent {
 .chat-header h2 {
     margin: 0;
     font-weight: 500;
+    flex: 1;
+    text-align: left;
 }
 
 .connecting {
@@ -362,12 +404,14 @@ button.accent {
     width: 100%;
 }
 
+.chat-container {
+    margin-left: 10px;
+    margin-right: 10px;
+}
 
 @media screen and (max-width: 730px) {
 
     .chat-container {
-        margin-left: 10px;
-        margin-right: 10px;
         margin-top: 10px;
     }
 }
