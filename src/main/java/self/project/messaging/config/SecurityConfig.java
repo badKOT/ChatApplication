@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -20,26 +21,24 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        // set the name of the attribute the CsrfToken will be populated on
+        requestHandler.setCsrfRequestAttributeName("_csrf");
+
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/**")
                         .authenticated())
                 .formLogin(login -> login
                         .defaultSuccessUrl("/chats", true))
-//                        .loginPage("/login")
-//                        .permitAll()
-//                        .failureUrl("/auth/login?error"))
                 .httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.csrfTokenRequestHandler(requestHandler))
                 .userDetailsService(userDetailsService);
-//                .logout(out -> out
-//                        .logoutUrl("/logout")
-//                        .invalidateHttpSession(true)
-//                        .logoutSuccessUrl("/auth/login"));
         return http.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return NoOpPasswordEncoder.getInstance(); // TODO() add encoding
     }
 }

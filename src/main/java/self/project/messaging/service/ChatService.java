@@ -21,4 +21,8 @@ public class ChatService {
         return chatRepository.findById(id).orElseThrow(() ->
                 new NoSuchElementException("Chat with id " + id + " not found"));
     }
+
+    public List<Chat> findForUser(Long userId) {
+        return chatRepository.findByUserId(userId);
+    }
 }

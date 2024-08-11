@@ -7,8 +7,8 @@ import self.project.messaging.dto.MessageDto;
 import self.project.messaging.model.Message;
 
 @Mapper
-public interface DtoMessageMapper {
-    DtoMessageMapper INSTANCE = Mappers.getMapper(DtoMessageMapper.class);
+public interface MessageMapper {
+    MessageMapper INSTANCE = Mappers.getMapper(MessageMapper.class);
 
     @Mapping(target = "content", source = "text")
     @Mapping(target = "sender", source = "sender.username")

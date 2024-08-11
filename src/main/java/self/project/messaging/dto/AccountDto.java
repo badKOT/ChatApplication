@@ -6,14 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
-public class ChatInfoDto {
-    private ChatIdTitleDto chat;
-    private List<MessageDto> messageList;
+public class AccountDto {
+
+    private Long id;
+    private String phoneNumber;
+    private String username;
 }

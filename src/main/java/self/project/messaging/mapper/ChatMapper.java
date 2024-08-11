@@ -6,9 +6,9 @@ import self.project.messaging.dto.ChatIdTitleDto;
 import self.project.messaging.model.Chat;
 
 @Mapper
-public interface DtoChatMapper {
+public interface ChatMapper {
 
-    DtoChatMapper INSTANCE = Mappers.getMapper(DtoChatMapper.class);
+    ChatMapper INSTANCE = Mappers.getMapper(ChatMapper.class);
 
     ChatIdTitleDto toDto(Chat chat);
 }

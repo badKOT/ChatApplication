@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,8 @@ public class Chat {
     @JoinTable(
             name = "accounts_chats",
             joinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "chat_id", referencedColumnName = "id")
+            inverseJoinColumns = @JoinColumn(name = "chat_id", referencedColumnName = "id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "chat_id"})
     )
     @ToString.Exclude
     private List<Account> participants;

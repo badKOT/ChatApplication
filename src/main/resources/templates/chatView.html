@@ -13,7 +13,17 @@
 <div id="chat-page">
     <div class="chat-container">
 
-        <div class="chat-header"></div>
+        <div class="chat-header">
+            <h2></h2>
+            <div class="add-user-form-holder">
+                <form id="addUserForm" name="addUserForm" method="POST">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <input id="userId_addUserForm" name="userId_addUserForm" type="hidden"/>
+                    <button type="submit" class="primary">Add User</button>
+                </form>
+                <div id="notification" class="notification"></div>
+            </div>
+        </div>
         <div class="connecting">
             Connecting...
         </div>
