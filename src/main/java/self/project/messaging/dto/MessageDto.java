@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import self.project.messaging.model.Message.MessageType;
 
 import java.time.Instant;
 

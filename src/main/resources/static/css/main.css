@@ -29,6 +29,11 @@ body {
     display: none;
 }
 
+section {
+    padding: 0;
+    margin: 0;
+}
+
 .form-control {
     width: 100%;
     min-height: 38px;
@@ -109,6 +114,7 @@ button.accent {
     margin-top: 10px;
     transition-duration: .5s;
     transition-property: opacity;
+    z-index: 1;
 }
 
 #username-page {
@@ -139,13 +145,19 @@ button.accent {
 #chat-page {
     position: relative;
     height: 100%;
+    flex-grow: 1;
+}
+
+#base {
+    display: flex;
+    height: 100%;
+    width: 100%;
 }
 
 #home-page {
     position: relative;
     height: 100%;
-    max-width: 26rem;
-    min-width: 16rem;
+    min-width: 20rem;
 }
 
 #MainHeader {
@@ -153,11 +165,8 @@ button.accent {
 }
 
 .header {
-    height: 3.5rem;
+    height: 4rem;
     padding: .375rem .8125rem .5rem .8125rem;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
     background-color: #fff;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
     z-index: 1;
@@ -384,8 +393,9 @@ button.accent {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 10px 15px;
     border-bottom: 1px solid #ececec;
+    height: 4rem;
 }
 
 .chat-header h2 {
@@ -405,7 +415,7 @@ button.accent {
 }
 
 .chat-container {
-    margin-left: 10px;
+    margin-left: 10px; /*TODO() убрать, но сейчас сливается с левым меню*/
     margin-right: 10px;
 }
 

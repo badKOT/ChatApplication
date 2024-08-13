@@ -9,9 +9,9 @@ const colors = [
 
 function loadChatList(userId) {
     fetchChatList(userId).then(payload => {
-        for (let i = 0; i < payload.length; i++) {
-            onChatReceived(payload[i], i);
-        }
+        payload.forEach((chat, index) => {
+            onChatReceived(chat, index);
+        });
     });
 }
 
@@ -20,10 +20,18 @@ function onChatReceived(chat, shift) {
     chatContainer.classList.add('ListItem', 'Chat', 'chat-item-clickable');
 
     let chatElement = document.createElement('a');
-    chatElement.href = `/chats/${chat.id}`;
     chatElement.role = 'button';
     chatElement.tabIndex = 0;
     chatElement.classList.add('ListItem-button');
+
+    chatElement.onclick = (event) => {
+        event.preventDefault();
+        window.history.replaceState(null, null, `/chats/${chat.id}`);
+        userIdInput.value = '';
+        userIdInput.type = 'hidden';
+        fetchChatInfo(chat.id)
+            .then(payload => connect(payload));
+    };
 
     let avatarContainer = document.createElement('div');
     avatarContainer.classList.add('status');
@@ -52,11 +60,6 @@ function onChatReceived(chat, shift) {
     chatListElement.appendChild(chatContainer);
 }
 
-const fetchChatList = async (userId) => {
-    const response = await fetch('http://localhost:8080/fetch/chatList/' + userId);
-    return await response.json();
-}
-
 function getAvatarColor(messageSender) {
     let hash = 0;
     for (let i = 0; i < messageSender.length; i++) {
@@ -66,8 +69,29 @@ function getAvatarColor(messageSender) {
     return colors[index];
 }
 
+const fetchChatList = async (userId) => {
+    const response = await fetch('http://localhost:8080/fetch/chatList/' + userId, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return await response.json();
+}
+
+const fetchChatInfo = async (chatId) => {
+    const response = await fetch('http://localhost:8080/fetch/chatInfo/' + chatId, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return await response.json();
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     if (chatListElement && userId) {
         loadChatList(userId);
+    }
+    if (chatInfo) {
+        connect(JSON.parse(chatInfo));
     }
 });

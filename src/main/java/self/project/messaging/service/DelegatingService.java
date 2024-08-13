@@ -11,6 +11,7 @@ import self.project.messaging.mapper.ChatMapper;
 import self.project.messaging.mapper.MessageMapper;
 import self.project.messaging.model.Account;
 import self.project.messaging.model.Chat;
+import self.project.messaging.model.Message.MessageType;
 
 import java.util.Comparator;
 import java.util.List;
@@ -42,11 +43,19 @@ public class DelegatingService {
         return new ChatFullDto(ChatMapper.INSTANCE.toDto(chat), participants, messageList);
     }
 
-    public void saveMessage(MessageDto messageDto) {
-        Account account = accountService.findByUsername(messageDto.getSender());
+    public MessageDto saveMessage(MessageDto messageDto) {
+        Account account;
+
+        if (messageDto.getType() == MessageType.JOIN) {
+            account = accountService.findById(Long.parseLong(messageDto.getSender()));
+            messageDto.setSender(account.getUsername());
+        } else {
+            account = accountService.findByUsername(messageDto.getSender());
+        }
         Chat chat = chatService.findById(messageDto.getChatId());
 
         messageService.save(messageDto, account, chat);
+        return messageDto;
     }
 
     @Transactional
