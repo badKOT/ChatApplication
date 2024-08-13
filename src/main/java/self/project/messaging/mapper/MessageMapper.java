@@ -10,10 +10,7 @@ import self.project.messaging.model.Message;
 public interface MessageMapper {
     MessageMapper INSTANCE = Mappers.getMapper(MessageMapper.class);
 
-    @Mapping(target = "content", source = "text")
     @Mapping(target = "sender", source = "sender.username")
-    @Mapping(target = "type", expression = "java(self.project.messaging.dto.MessageType.CHAT)")
-    @Mapping(target = "sent", source = "sent")
     @Mapping(target = "chatId", source = "chat.id")
     MessageDto toDto(Message message);
 }

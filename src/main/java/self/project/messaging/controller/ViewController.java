@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import self.project.messaging.dto.ChatFullDto;
 import self.project.messaging.model.Account;
@@ -30,24 +29,19 @@ public class ViewController {
     public String chatList(Principal principal, Model model) {
         Account account = accountService.findByUsername(principal.getName());
         model.addAttribute("userId", account.getId());
+        model.addAttribute("username", account.getUsername());
         return "index";
     }
 
     @GetMapping("/{id}")
     public String getChatById(@PathVariable Long id, Model model, Principal principal) throws JsonProcessingException {
         om.registerModule(new JavaTimeModule());
+        Account account = accountService.findByUsername(principal.getName());
         ChatFullDto chatInfo = delegatingService.loadChatById(id);
 
+        model.addAttribute("userId", account.getId());
         model.addAttribute("username", principal.getName());
         model.addAttribute("chatInfo", om.writeValueAsString(chatInfo));
-        return "chatView";
-    }
-
-    @PostMapping("/{id}/add/{userId}")
-    public String addUserToChat(@PathVariable("id") Long id, @PathVariable("userId") Long userId) {
-        System.out.printf("Adding user %d to chat %d\n", userId, id);
-        delegatingService.addUserToChat(id, userId);
-        // TODO() message that a user was added
-        return "redirect:/chats/" + id;
+        return "index";
     }
 }

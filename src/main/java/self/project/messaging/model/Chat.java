@@ -36,8 +36,8 @@ public class Chat {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "accounts_chats",
-            joinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "chat_id", referencedColumnName = "id"),
+            joinColumns = @JoinColumn(name = "chat_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "account_id", referencedColumnName = "id"),
             uniqueConstraints = @UniqueConstraint(columnNames = {"account_id", "chat_id"})
     )
     @ToString.Exclude

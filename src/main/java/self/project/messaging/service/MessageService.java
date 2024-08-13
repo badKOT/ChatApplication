@@ -16,7 +16,13 @@ public class MessageService {
     private final MessageRepository repository;
 
     public void save(MessageDto messageDto, Account account, Chat chat) {
-        repository.save(new Message(null, messageDto.getContent(), messageDto.getSent(), account, chat));
+        repository.save(Message.builder()
+                .content(messageDto.getContent())
+                .sent(messageDto.getSent())
+                .type(messageDto.getType())
+                .sender(account)
+                .chat(chat)
+                .build());
     }
 
     public List<Message> findByChat(Long chatId) {

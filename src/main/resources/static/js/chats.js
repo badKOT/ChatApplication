@@ -8,41 +8,38 @@ const chatHeader = document.querySelector('.chat-header h2');
 const addUserForm = document.querySelector('#addUserForm');
 const userIdInput = document.querySelector('#userId_addUserForm');
 const notificationElement = document.querySelector('#notification');
-const colors = [
-    '#2196F3', '#32c787', '#00BCD4', '#ff5652',
-    '#ffc107', '#ff85af', '#FF9800', '#39bbb0'
-];
+const chatPageSection = document.querySelector('#chat-page');
 
 messageForm.addEventListener('submit', sendMessage, true);
 addUserForm.addEventListener('submit', addUser, true);
-chatInfo = JSON.parse(chatInfo);
 
 let stompClient = null;
-connect();
 
-function connect() {
+function connect(chat_info) {
+    // Assign to global variable so we can use it everywhere
+    chatInfo = chat_info;
+    // if we're switching between chats, clear out the page
+    if (chatPageSection.style.display === 'block') {
+        chatHeader.innerText = '';
+        messageArea.innerHTML = '';
+        connectingElement.classList.remove('hidden');
+    }
+
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, onConnect, onError);
-    loadChatInfo()
+    chatPageSection.style.display = 'block';
+    loadChatHeader()
 }
 
-function loadChatInfo() {
-    const headerText = document.createTextNode(chatInfo.title);
-    chatHeader.appendChild(headerText);
+function loadChatHeader() {
+    chatHeader.innerText = chatInfo.title;
+    // TODO() add chat info like participants and stuff
 }
 
 function onConnect() {
     // subscribe to the public topic
     stompClient.subscribe('/topic/chat/' + chatInfo.id, onMessageReceived);
-
-    // pass username to the server
-    // TODO() Temporarily disabled. Need to fix it.
-    // stompClient.send(
-    //     '/app/chat.addUser',
-    //     {},
-    //     JSON.stringify({sender: username, type: 'JOIN'})
-    // );
 
     connectingElement.classList.add('hidden')
     let messageList = chatInfo.messageList;
@@ -51,18 +48,13 @@ function onConnect() {
     }
 }
 
+// TODO() clean up and refactor
 function onMessageReceived(payload, removeHeaders = true) {
     const message = removeHeaders ? JSON.parse(payload.body) : payload;
 
     let messageElement = document.createElement('li');
 
-    if (message.type === 'JOIN') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' joined!';
-    } else if (message.type === 'LEAVE') {
-        messageElement.classList.add('event-message');
-        message.content = message.sender + ' left!';
-    } else {
+    if (message.type === 'CHAT') {
         messageElement.classList.add('chat-message');
 
         let avatarElement = document.createElement('i');
@@ -80,19 +72,31 @@ function onMessageReceived(payload, removeHeaders = true) {
         let usernameText = document.createTextNode(message.sender);
         usernameElement.appendChild(usernameText);
         messageWrapper.appendChild(usernameElement);
+
+        let textElement = document.createElement('p');
+        let messageText = document.createTextNode(message.content);
+        textElement.appendChild(messageText);
+
+        messageWrapper.appendChild(textElement);
+        let timeElement = document.createElement('span');
+        timeElement.classList.add('message-time');
+        let timeText = document.createTextNode(message.sent);
+        timeElement.appendChild(timeText);
+        messageWrapper.appendChild(timeElement);
+    } else {
+        messageElement.classList.add('event-message');
+
+        if (message.type === 'JOIN') {
+            message.content = message.sender + ' joined!';
+        } else {
+            message.content = message.send + ' left!';
+        }
+
+        let textElement = document.createElement('p');
+        let messageText = document.createTextNode(message.content);
+        textElement.appendChild(messageText);
+        messageElement.appendChild(textElement);
     }
-
-    let textElement = document.createElement('p');
-    let messageText = document.createTextNode(message.content);
-    textElement.appendChild(messageText);
-
-    messageWrapper.appendChild(textElement);
-
-    let timeElement = document.createElement('span');
-    timeElement.classList.add('message-time');
-    let timeText = document.createTextNode(message.sent);
-    timeElement.appendChild(timeText);
-    messageWrapper.appendChild(timeElement);
 
     messageArea.appendChild(messageElement);
     messageArea.scrollTop = messageArea.scrollHeight;
@@ -138,7 +142,6 @@ function addUser(event) {
     // when someone pressed the "Add user" button first time, show that input form
     if (userIdInput.type === 'hidden') {
         userIdInput.type = 'text';
-        userIdInput.placeholder = 'Enter user id';
         userIdInput.focus();
         event.preventDefault();
         return;
@@ -155,8 +158,21 @@ function addUser(event) {
         event.preventDefault();
 
     } else if (userId && !isUserInChat(userId)) {
-        addUserForm.action = '/chats/' + chatInfo.id + '/add/' + userId;
         userIdInput.value = '';
+        userIdInput.type = 'hidden';
+        event.preventDefault();
+
+        // send event to the server
+        stompClient.send(
+            '/app/chat.addUser',
+            {},
+            JSON.stringify({
+                sender: userId,
+                type: 'JOIN',
+                sent: new Date(Date.now()).toISOString(),
+                chatId: chatInfo.id
+            })
+        );
     }
 }
 
