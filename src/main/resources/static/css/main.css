@@ -41,10 +41,6 @@ section {
     border: 1px solid #c8c8c8;
 }
 
-.form-group {
-    margin-bottom: 15px;
-}
-
 input {
     padding-left: 10px;
     outline: none;
@@ -302,7 +298,12 @@ button.accent {
 }
 
 #chat-page #messageForm {
-    padding: 20px;
+    padding: 1rem;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
 #chat-page ul li {

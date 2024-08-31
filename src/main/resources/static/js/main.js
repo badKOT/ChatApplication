@@ -17,8 +17,16 @@ function loadChatList(userId) {
 
 function onChatReceived(chat, shift) {
     let chatContainer = document.createElement('div');
+    let chatElement = prepareChatElement(chat);
+
+    chatContainer.style.top = `${72 * shift}px`;
     chatContainer.classList.add('ListItem', 'Chat', 'chat-item-clickable');
 
+    chatContainer.appendChild(chatElement);
+    chatListElement.appendChild(chatContainer);
+}
+
+function prepareChatElement(chat) {
     let chatElement = document.createElement('a');
     chatElement.role = 'button';
     chatElement.tabIndex = 0;
@@ -33,31 +41,44 @@ function onChatReceived(chat, shift) {
             .then(payload => connect(payload));
     };
 
+    let avatarElement = prepareChatAvatar(chat.title);
+    let chatInfoContainer = prepareChatInfoElement(chat.title);
+
+    chatElement.appendChild(avatarElement);
+    chatElement.appendChild(chatInfoContainer);
+
+    return chatElement;
+}
+
+function prepareChatAvatar(title) {
     let avatarContainer = document.createElement('div');
-    avatarContainer.classList.add('status');
     let avatarElement = document.createElement('div');
+    let avatarText = document.createTextNode(title[0]);
+
+    avatarContainer.classList.add('status');
     avatarElement.classList.add('Avatar');
-    let avatarText = document.createTextNode(chat.title[0]);
+    avatarElement.style.backgroundColor = getAvatarColor(title);
+
     avatarElement.appendChild(avatarText);
-    avatarElement.style['background-color'] = getAvatarColor(chat.title);
     avatarContainer.appendChild(avatarElement);
 
+    return avatarContainer;
+}
+
+function prepareChatInfoElement(title) {
     let chatInfoContainer = document.createElement('div');
-    chatInfoContainer.classList.add('info');
     let titleContainer = document.createElement('div');
-    titleContainer.classList.add('title');
     let titleElement = document.createElement('span');
-    let titleText = document.createTextNode(chat.title);
+    let titleText = document.createTextNode(title);
+
+    titleContainer.classList.add('title');
+    chatInfoContainer.classList.add('info');
+
     titleElement.appendChild(titleText);
     titleContainer.appendChild(titleElement);
     chatInfoContainer.appendChild(titleContainer);
 
-    chatElement.appendChild(avatarContainer);
-    chatElement.appendChild(chatInfoContainer);
-    chatContainer.appendChild(chatElement);
-    chatContainer.style['top'] = `${72 * shift}px`;
-
-    chatListElement.appendChild(chatContainer);
+    return chatInfoContainer;
 }
 
 function getAvatarColor(messageSender) {

@@ -22,7 +22,6 @@ import java.security.Principal;
 public class ViewController {
 
     private final DelegatingService delegatingService;
-    private final ObjectMapper om;
     private final AccountService accountService;
 
     @GetMapping()
@@ -35,13 +34,14 @@ public class ViewController {
 
     @GetMapping("/{id}")
     public String getChatById(@PathVariable Long id, Model model, Principal principal) throws JsonProcessingException {
-        om.registerModule(new JavaTimeModule());
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
         Account account = accountService.findByUsername(principal.getName());
         ChatFullDto chatInfo = delegatingService.loadChatById(id);
 
         model.addAttribute("userId", account.getId());
         model.addAttribute("username", principal.getName());
-        model.addAttribute("chatInfo", om.writeValueAsString(chatInfo));
+        model.addAttribute("chatInfo", mapper.writeValueAsString(chatInfo));
         return "index";
     }
 }

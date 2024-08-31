@@ -50,39 +50,19 @@ function onConnect() {
 
 // TODO() clean up and refactor
 function onMessageReceived(payload, removeHeaders = true) {
-    const message = removeHeaders ? JSON.parse(payload.body) : payload;
 
+    const message = removeHeaders ? JSON.parse(payload.body) : payload;
     let messageElement = document.createElement('li');
 
     if (message.type === 'CHAT') {
         messageElement.classList.add('chat-message');
 
-        let avatarElement = document.createElement('i');
-        let avatarText = document.createTextNode(message.sender[0]);
-        avatarElement.appendChild(avatarText);
-        avatarElement.style['background-color'] = getAvatarColor(message.sender);
+        let avatarElement = prepareAvatarElement(message.sender);
+        let messageWrapper = prepareChatMessageElement(message);
 
         messageElement.appendChild(avatarElement);
+        messageElement.appendChild(messageWrapper);
 
-        var messageWrapper = document.createElement('div');
-        messageWrapper.classList.add('message-wrapper');
-        messageElement.appendChild(messageWrapper)
-
-        let usernameElement = document.createElement('span');
-        let usernameText = document.createTextNode(message.sender);
-        usernameElement.appendChild(usernameText);
-        messageWrapper.appendChild(usernameElement);
-
-        let textElement = document.createElement('p');
-        let messageText = document.createTextNode(message.content);
-        textElement.appendChild(messageText);
-
-        messageWrapper.appendChild(textElement);
-        let timeElement = document.createElement('span');
-        timeElement.classList.add('message-time');
-        let timeText = document.createTextNode(message.sent);
-        timeElement.appendChild(timeText);
-        messageWrapper.appendChild(timeElement);
     } else {
         messageElement.classList.add('event-message');
 
@@ -92,9 +72,7 @@ function onMessageReceived(payload, removeHeaders = true) {
             message.content = message.send + ' left!';
         }
 
-        let textElement = document.createElement('p');
-        let messageText = document.createTextNode(message.content);
-        textElement.appendChild(messageText);
+        let textElement = prepareTextElement(message.content);
         messageElement.appendChild(textElement);
     }
 
@@ -104,7 +82,53 @@ function onMessageReceived(payload, removeHeaders = true) {
 
 function onError() {
     connectingElement.textContent = 'Could not connect to WebSocket server'
+    connectingElement.classList.remove('hidden');
     connectingElement.style.color = 'red';
+}
+
+function prepareAvatarElement(sender) {
+    let avatarElement = document.createElement('i');
+    let avatarText = document.createTextNode(sender[0]);
+    avatarElement.appendChild(avatarText);
+    avatarElement.style.backgroundColor = getAvatarColor(sender);
+    return avatarElement;
+}
+
+function prepareChatMessageElement(message) {
+    let usernameElement = prepareUsernameElement(message.sender);
+    let textElement = prepareTextElement(message.content);
+    let timeElement = prepareTimeElement(message.sent);
+
+    var messageWrapper = document.createElement('div');
+    messageWrapper.classList.add('message-wrapper');
+    messageWrapper.appendChild(usernameElement);
+    messageWrapper.appendChild(textElement);
+    messageWrapper.appendChild(timeElement);
+
+    return messageWrapper;
+}
+
+function prepareUsernameElement(sender) {
+    let usernameElement = document.createElement('span');
+    let usernameText = document.createTextNode(sender);
+    usernameElement.appendChild(usernameText);
+    return usernameElement;
+}
+
+function prepareTextElement(content) {
+    let textElement = document.createElement('p');
+    let messageText = document.createTextNode(content);
+    textElement.appendChild(messageText);
+    return textElement;
+}
+
+function prepareTimeElement(timestamp) {
+    let timeElement = document.createElement('span');
+    timeElement.classList.add('message-time');
+    const date = new Date(timestamp * 1000);
+    let timeText = document.createTextNode(date.toISOString());
+    timeElement.appendChild(timeText);
+    return timeElement;
 }
 
 function sendMessage(event) {

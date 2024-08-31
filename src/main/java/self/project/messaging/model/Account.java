@@ -34,5 +34,6 @@ public class Account {
     private String username;
 
     @ManyToMany(mappedBy = "participants")
+    @ToString.Exclude
     private List<Chat> chatList;
 }
