@@ -2,6 +2,7 @@ package self.project.messaging.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -34,8 +35,11 @@ public class ViewController {
 
     @GetMapping("/{id}")
     public String getChatById(@PathVariable Long id, Model model, Principal principal) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.registerModule(new JavaTimeModule());
+        ObjectMapper mapper = JsonMapper.builder()
+                .findAndAddModules()
+                .build(); // TODO() check: should work the same way as commented lines above do
         Account account = accountService.findByUsername(principal.getName());
         ChatFullDto chatInfo = delegatingService.loadChatById(id);
 

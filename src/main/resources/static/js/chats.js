@@ -48,7 +48,6 @@ function onConnect() {
     }
 }
 
-// TODO() clean up and refactor
 function onMessageReceived(payload, removeHeaders = true) {
 
     const message = removeHeaders ? JSON.parse(payload.body) : payload;

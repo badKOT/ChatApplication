@@ -2,6 +2,7 @@ package self.project.messaging.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,8 +39,11 @@ public class FetchController {
     @GetMapping("/chatInfo/{id}")
     public String chatInfo(@PathVariable Long id) throws JsonProcessingException {
         ChatFullDto chatInfo = delegatingService.loadChatById(id);
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.registerModule(new JavaTimeModule());
+        ObjectMapper mapper = JsonMapper.builder()
+                .findAndAddModules()
+                .build(); // TODO() check: should work the same way as commented lines above do
         return mapper.writeValueAsString(chatInfo);
     }
 }

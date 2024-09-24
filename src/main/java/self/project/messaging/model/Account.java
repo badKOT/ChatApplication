@@ -1,12 +1,5 @@
 package self.project.messaging.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,21 +12,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-@Table(name = "accounts")
 @ToString
 public class Account {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, name = "phone_number", length = 11)
-    private String phoneNumber;
-    @Column(nullable = false)
     private String password;
-    @Column(unique = true, nullable = false)
+    private String phoneNumber;
     private String username;
+    private String role;
 
-    @ManyToMany(mappedBy = "participants")
-    @ToString.Exclude
-    private List<Chat> chatList;
+    private List<Long> chats;
 }
