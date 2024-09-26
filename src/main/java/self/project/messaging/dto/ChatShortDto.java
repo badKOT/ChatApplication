@@ -11,7 +11,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ChatIdTitleDto {
+public class ChatShortDto {
     private Long id;
     private String title;
 }

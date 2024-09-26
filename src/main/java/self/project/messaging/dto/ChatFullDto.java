@@ -20,7 +20,7 @@ public class ChatFullDto {
     private List<AccountDto> participants;
     private List<MessageDto> messageList;
 
-    public ChatFullDto(ChatIdTitleDto shortDto, List<AccountDto> participants, List<MessageDto> messageList) {
+    public ChatFullDto(ChatShortDto shortDto, List<AccountDto> participants, List<MessageDto> messageList) {
         this.id = shortDto.getId();
         this.title = shortDto.getTitle();
         this.participants = participants;

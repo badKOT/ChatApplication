@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import self.project.messaging.dto.MessageDto;
 import self.project.messaging.service.DelegatingService;
+import self.project.messaging.service.MessageService;
 
 @Controller
 @RequiredArgsConstructor
@@ -15,11 +16,12 @@ public class WebSocketMessageController {
 
     private final DelegatingService delegatingService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final MessageService messageService;
 
     @MessageMapping("/chat.sendMessage")
     public MessageDto sendMessage(@Payload MessageDto messageDto) {
         System.out.println("Got the request to send the message: " + messageDto);
-        delegatingService.saveMessage(messageDto);
+        messageService.save(messageDto);
 
         messagingTemplate.convertAndSend("/topic/chat/" + messageDto.getChatId(), messageDto);
         return messageDto;
@@ -28,17 +30,15 @@ public class WebSocketMessageController {
     @MessageMapping("/chat.addUser")
     public MessageDto addUser(@Payload MessageDto messageDto, SimpMessageHeaderAccessor headerAccessor) {
         System.out.println("Got the request to add user: " + messageDto);
-        // When user is added, sender field contains his id. Need to replace it with username.
+        // When user is added, content field contains id of the user being added. Need to change to username of this user
+        // TODO() rethink this shit
 
-        // TODO() check if user exists
-
-        delegatingService.addUserToChat(messageDto.getChatId(), Long.parseLong(messageDto.getSender()));
-        messageDto = delegatingService.saveMessage(messageDto);
+        delegatingService.addUserToChat(messageDto);
 
         messagingTemplate.convertAndSend("/topic/chat/" + messageDto.getChatId(), messageDto);
 
         // add username to web socket session
-        headerAccessor.getSessionAttributes().put("username", messageDto.getSender());
+        headerAccessor.getSessionAttributes().put("username", messageDto.getContent());
         return messageDto;
     }
 }

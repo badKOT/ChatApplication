@@ -3,7 +3,6 @@ package self.project.messaging.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import self.project.messaging.model.Account;
 
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
-    private final Account account;
+    private final AccountFullDto account;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -44,12 +44,11 @@ function onConnect() {
     connectingElement.classList.add('hidden')
     let messageList = chatInfo.messageList;
     for (let i = 0; i < messageList.length; i++) {
-        onMessageReceived(messageList[i], false);
+        onMessageReceived(messageList[i], false, true);
     }
 }
 
-// TODO() clean up and refactor
-function onMessageReceived(payload, removeHeaders = true) {
+function onMessageReceived(payload, removeHeaders = true, adjustTimeFormat = false) {
 
     const message = removeHeaders ? JSON.parse(payload.body) : payload;
     let messageElement = document.createElement('li');
@@ -58,7 +57,7 @@ function onMessageReceived(payload, removeHeaders = true) {
         messageElement.classList.add('chat-message');
 
         let avatarElement = prepareAvatarElement(message.sender);
-        let messageWrapper = prepareChatMessageElement(message);
+        let messageWrapper = prepareChatMessageElement(message, adjustTimeFormat);
 
         messageElement.appendChild(avatarElement);
         messageElement.appendChild(messageWrapper);
@@ -67,9 +66,9 @@ function onMessageReceived(payload, removeHeaders = true) {
         messageElement.classList.add('event-message');
 
         if (message.type === 'JOIN') {
-            message.content = message.sender + ' joined!';
+            message.content = message.content + ' joined!';
         } else {
-            message.content = message.send + ' left!';
+            message.content = message.sender + ' left!';
         }
 
         let textElement = prepareTextElement(message.content);
@@ -88,16 +87,16 @@ function onError() {
 
 function prepareAvatarElement(sender) {
     let avatarElement = document.createElement('i');
-    let avatarText = document.createTextNode(sender[0]);
+    let avatarText = document.createTextNode(sender.username[0]);
     avatarElement.appendChild(avatarText);
-    avatarElement.style.backgroundColor = getAvatarColor(sender);
+    avatarElement.style.backgroundColor = getAvatarColor(sender.username);
     return avatarElement;
 }
 
-function prepareChatMessageElement(message) {
-    let usernameElement = prepareUsernameElement(message.sender);
+function prepareChatMessageElement(message, adjustTimeFormat) {
+    let usernameElement = prepareUsernameElement(message.sender.username);
     let textElement = prepareTextElement(message.content);
-    let timeElement = prepareTimeElement(message.sent);
+    let timeElement = prepareTimeElement(message.sent, adjustTimeFormat);
 
     var messageWrapper = document.createElement('div');
     messageWrapper.classList.add('message-wrapper');
@@ -122,10 +121,10 @@ function prepareTextElement(content) {
     return textElement;
 }
 
-function prepareTimeElement(timestamp) {
+function prepareTimeElement(timestamp, adjustTimeFormat) {
     let timeElement = document.createElement('span');
     timeElement.classList.add('message-time');
-    const date = new Date(timestamp * 1000);
+    const date = adjustTimeFormat ? new Date(timestamp * 1000) : new Date(timestamp);
     let timeText = document.createTextNode(date.toISOString());
     timeElement.appendChild(timeText);
     return timeElement;
@@ -136,7 +135,10 @@ function sendMessage(event) {
     if (messageContent && stompClient) {
 
         const chatMessage = {
-            sender: username,
+            sender: {
+                id: Number(userId),
+                username: username
+            },
             content: messageContent,
             type: 'CHAT',
             sent: new Date(Date.now()).toISOString(),
@@ -171,8 +173,8 @@ function addUser(event) {
         return;
     }
 
-    const userId = userIdInput.value.trim();
-    if (userId && isUserInChat(userId)) {
+    const addedUserId = userIdInput.value.trim();
+    if (addedUserId && isUserInChat(addedUserId)) {
         notificationElement.style.opacity = '100';
         notificationElement.textContent = 'User is already in the chat.';
 
@@ -181,7 +183,7 @@ function addUser(event) {
         }, 3000);
         event.preventDefault();
 
-    } else if (userId && !isUserInChat(userId)) {
+    } else if (addedUserId && !isUserInChat(addedUserId)) {
         userIdInput.value = '';
         userIdInput.type = 'hidden';
         event.preventDefault();
@@ -191,10 +193,14 @@ function addUser(event) {
             '/app/chat.addUser',
             {},
             JSON.stringify({
-                sender: userId,
+                sender: {
+                    id: Number(userId),
+                    username: username
+                },
                 type: 'JOIN',
                 sent: new Date(Date.now()).toISOString(),
-                chatId: chatInfo.id
+                chatId: chatInfo.id,
+                content: addedUserId
             })
         );
     }
