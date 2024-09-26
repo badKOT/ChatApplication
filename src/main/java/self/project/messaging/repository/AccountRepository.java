@@ -3,8 +3,13 @@ package self.project.messaging.repository;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
-import self.project.messaging.model.Account;
+import self.project.messaging.dto.AccountDto;
 import self.project.messaging.model.tables.Accounts;
+import self.project.messaging.model.tables.AccountsChats;
+import self.project.messaging.security.AccountFullDto;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -12,90 +17,36 @@ public class AccountRepository {
 
     private final DSLContext dsl;
 
-    public Account save(Account account) {
-        return dsl.insertInto(Accounts.ACCOUNTS)
-                .columns(Accounts.ACCOUNTS.USERNAME,
-                        Accounts.ACCOUNTS.PASSWORD,
-                        Accounts.ACCOUNTS.PHONE_NUMBER)
-                .values(account.getUsername(),
-                        account.getPassword(),
-                        account.getPhoneNumber())
-                .returning(Accounts.ACCOUNTS.ID)
-                .fetchOptionalInto(Account.class)
-                .orElseThrow(() -> new IllegalArgumentException("Error saving entity: " + account.getId()));
-    }
-
-    public Long betterSave(Account account) {
-        return dsl.insertInto(Accounts.ACCOUNTS)
-                .set(dsl.newRecord(Accounts.ACCOUNTS, account))
-                .returning(Accounts.ACCOUNTS.ID)
-                .fetchOptionalInto(Account.class)
-                .orElseThrow(() -> new IllegalArgumentException("Error saving entity: " + account.getId()))
-                .getId();
-    }
-
-    public Account update(Account account) {
-        return dsl.update(Accounts.ACCOUNTS)
-                .set(dsl.newRecord(Accounts.ACCOUNTS, account))
-                .where(Accounts.ACCOUNTS.ID.eq(account.getId()))
-                .returning()
-                .fetchOptionalInto(Account.class)
-                .orElseThrow(() -> new IllegalArgumentException("Error updating entity: " + account.getId()));
-    }
-
-    public Account findById(Long id) {
+    public Optional<AccountDto> findById(Long id) {
         return dsl.selectFrom(Accounts.ACCOUNTS)
                 .where(Accounts.ACCOUNTS.ID.eq(id))
-                .fetchOneInto(Account.class);
+                .fetchOptionalInto(AccountDto.class);
     }
 
-    public Boolean delete(Long id) {
-        return dsl.delete(Accounts.ACCOUNTS)
-                .where(Accounts.ACCOUNTS.ID.eq(id))
-                .execute() == 1;
+    public Optional<AccountDto> findByUsername(String username) {
+        return dsl.selectFrom(Accounts.ACCOUNTS)
+                .where(Accounts.ACCOUNTS.USERNAME.eq(username))
+                .fetchOptionalInto(AccountDto.class);
     }
 
-    public Account testFindById(Long id) {
-        return dsl.fetchOptional(Accounts.ACCOUNTS, Accounts.ACCOUNTS.ID.eq(id))
-                .orElseThrow(() -> new IllegalArgumentException("Error finding entity: " + id))
-                .into(Account.class);
+    public Optional<AccountFullDto> findFullByUsername(String username) {
+        return dsl.selectFrom(Accounts.ACCOUNTS)
+                .where(Accounts.ACCOUNTS.USERNAME.eq(username))
+                .fetchOptionalInto(AccountFullDto.class);
     }
 
-    /*
-    One-to-many select example:
-
-    public Country find(Long id) {
-        return dsl.selectFrom(Countries.COUNTRIES)
-                .where(Countries.COUNTRIES.ID.eq(id))
-                .fetchAny()
-                .map(r -> {
-                    Country country = r.into(Country.class);
-                    country.setCities(cityRepository.findAll(Cities.CITIES.COUNTRY_ID.eq(country.getId())));
-                    return country;
-                });
+    public List<AccountDto> findByChatId(Long chatId) {
+        return dsl.select(Accounts.ACCOUNTS.ID, Accounts.ACCOUNTS.PHONE_NUMBER, Accounts.ACCOUNTS.USERNAME)
+                .from(Accounts.ACCOUNTS
+                        .join(AccountsChats.ACCOUNTS_CHATS)
+                        .on(Accounts.ACCOUNTS.ID.eq(AccountsChats.ACCOUNTS_CHATS.ACCOUNT_ID)))
+                .where(AccountsChats.ACCOUNTS_CHATS.CHAT_ID.eq(chatId))
+                .fetchInto(AccountDto.class);
     }
 
-    Можно вынести маппинг в отдельный класс:
-
-    @Component
-    public class CountryRecordMapper implements RecordMapper<CountriesRecord, Country> {
-
-        private final CityRepository cityRepository;
-
-        @Override
-        public Country map(CountriesRecord record) {
-            Country country = record.into(Country.class);
-            country.setCities(cityRepository.findAll(Cities.CITIES.COUNTRY_ID.eq(country.getId())));
-            return country;
-        }
+    public void addUserToChat(Long chatId, Long userId) {
+        dsl.insertInto(AccountsChats.ACCOUNTS_CHATS)
+                .values(chatId, userId)
+                .execute();
     }
-
-    Тогда метод в репозитории превратится в:
-    public Country findWithCustomMapper(Long id) {
-        return dsl.selectFrom(Countries.COUNTRIES)
-                .where(Countries.COUNTRIES.ID.eq(id))
-                .fetchAny()
-                .map(r -> countryRecordMapper.map((CountriesRecord) r));
-    }
-     */
 }

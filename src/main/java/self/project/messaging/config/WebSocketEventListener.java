@@ -8,7 +8,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 import self.project.messaging.dto.MessageDto;
-import self.project.messaging.model.Message.MessageType;
+import self.project.messaging.dto.MessageType;
 
 @Component
 @RequiredArgsConstructor
@@ -25,7 +25,7 @@ public class WebSocketEventListener {
             log.info("User {} disconnected!", username);
             var chatMessage = MessageDto.builder()
                     .type(MessageType.LEAVE)
-                    .sender(username)
+                    .sender(new MessageDto.Sender(null, username))
                     .build();
             messageTemplate.convertAndSend("/topic/public", chatMessage);
         }

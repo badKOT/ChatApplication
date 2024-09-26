@@ -1,4 +1,4 @@
-package self.project.messaging.model;
+package self.project.messaging.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,9 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Chat {
+public class AccountFullDto {
     private Long id;
-    private String title;
+    private String password;
+    private String phoneNumber;
+    private String username;
+    private String role;
 
-    private List<Long> participants;
+    private List<Long> chats;
 }

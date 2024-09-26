@@ -21,7 +21,7 @@
 	</properties>
 
 	<dependencies>
-<!--	Spring Boot starters-->
+		<!-- Spring Starters -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -157,8 +157,8 @@
 				</executions>
 				<configuration>
 					<jdbc> <!-- db settings go here -->
-						<driver>org.postgresql.Driver</driver> <!-- TODO() try using variables instead -->
-						<url>jdbc:postgresql://localhost:5432/ws</url> <!-- TODO() check if it's needed at all -->
+						<driver>org.postgresql.Driver</driver>
+						<url>jdbc:postgresql://localhost:5432/ws?currentSchema=flyway</url>
 						<user>postgres</user>
 						<password>postgres</password>
 					</jdbc>
@@ -168,7 +168,7 @@
 							<excludes>  <!-- исключаемые подпакеты и файлы -->
 								flyway_schema_history
 							</excludes>
-							<inputSchema>public</inputSchema>  <!-- схема -->
+							<inputSchema>flyway</inputSchema>  <!-- схема -->
 						</database>
 						<generate>
 							<records>true</records>

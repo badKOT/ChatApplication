@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import self.project.messaging.model.Message.MessageType;
 
 import java.time.Instant;
 
@@ -19,8 +18,11 @@ import java.time.Instant;
 public class MessageDto {
 
     private String content;
-    private String sender;
+    private Sender sender;
     private MessageType type;
     private Instant sent;
     private Long chatId;
+
+    public record Sender(Long id, String username) {
+    }
 }

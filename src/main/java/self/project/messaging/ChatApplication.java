@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@EnableTransactionManagement // may be wrong
+@EnableTransactionManagement
 public class ChatApplication {
 
 	public static void main(String[] args) {
