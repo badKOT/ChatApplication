@@ -14,10 +14,6 @@ import java.util.NoSuchElementException;
 public class AccountService {
     private final AccountRepository repository;
 
-//    public Long save(Account account) {
-//        return repository.save(account);
-//    }
-
     public AccountDto findById(Long id) {
         return repository.findById(id).orElseThrow(() ->
                 new NoSuchElementException("Account with id " + id + " not found"));

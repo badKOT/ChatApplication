@@ -19,6 +19,4 @@ public class AccountFullDto {
     private String phoneNumber;
     private String username;
     private String role;
-
-    private List<Long> chats;
 }
