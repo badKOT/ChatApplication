@@ -1,0 +1,4 @@
+1. Prepare migrations for Flyway in resources/db/migration package
+2. Run mvn flyway:migrate
+3. Run mvn jooq-codegen:generate (needs to be called manually, isn't linked to any phase)
+4. Run mvn spring-boot:run

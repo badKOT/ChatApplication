@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 import self.project.messaging.dto.ChatShortDto;
+import self.project.messaging.dto.NewChatRqDto;
 import self.project.messaging.model.tables.AccountsChats;
 import self.project.messaging.model.tables.Chats;
 
@@ -14,6 +15,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ChatRepository {
     private final DSLContext dsl;
+
+    public Optional<Long> save(NewChatRqDto chat) {
+        return dsl.insertInto(Chats.CHATS)
+                .set(dsl.newRecord(Chats.CHATS, chat))
+                .returning(Chats.CHATS.ID)
+                .fetchOptionalInto(ChatShortDto.class)
+                .map(res -> res.getId());
+    }
 
     public List<ChatShortDto> findByUserId(Long userId) {
         return dsl.select(Chats.CHATS.ID, Chats.CHATS.TITLE)

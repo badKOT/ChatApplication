@@ -3,6 +3,7 @@ package self.project.messaging.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import self.project.messaging.dto.ChatShortDto;
+import self.project.messaging.dto.NewChatRqDto;
 import self.project.messaging.repository.ChatRepository;
 
 import java.util.List;
@@ -12,6 +13,11 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class ChatService {
     private final ChatRepository repository;
+
+    public Long save(NewChatRqDto dto) {
+        return repository.save(dto).orElseThrow(() ->
+                new IllegalArgumentException("Error saving chat with name: " + dto.title()));
+    }
 
     public ChatShortDto findByIdShort(Long id) {
         return repository.findByIdShort(id).orElseThrow(() ->

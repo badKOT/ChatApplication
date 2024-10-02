@@ -1,17 +1,29 @@
 'use strict';
 
+const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
 const messageForm = document.querySelector('#messageForm');
 const messageInput = document.querySelector('#message');
 const messageArea = document.querySelector('#messageArea');
 const connectingElement = document.querySelector('.connecting');
 const chatHeader = document.querySelector('.chat-header h2');
+const addUserFormHolder = document.querySelector('.add-user-form-holder');
 const addUserForm = document.querySelector('#addUserForm');
 const userIdInput = document.querySelector('#userId_addUserForm');
 const notificationElement = document.querySelector('#notification');
 const chatPageSection = document.querySelector('#chat-page');
+const createChatButton = document.querySelector('#create-chat-form button');
+const chatTitleInput = document.querySelector('#create-chat-title');
+const createChatHolder = document.querySelector('#create-chat-holder');
 
 messageForm.addEventListener('submit', sendMessage, true);
 addUserForm.addEventListener('submit', addUser, true);
+createChatButton.onclick = ((event) => createChatEvent(event));
+createChatHolder.addEventListener('mouseenter', () => revealTextInputField(chatTitleInput));
+createChatHolder.addEventListener('mouseleave', () => hideTextInputField(chatTitleInput));
+addUserFormHolder.addEventListener('mouseenter', () => revealTextInputField(userIdInput));
+addUserFormHolder.addEventListener('mouseleave', () => hideTextInputField(userIdInput));
 
 let stompClient = null;
 
@@ -164,29 +176,24 @@ function getAvatarColor(messageSender) {
 }
 
 function addUser(event) {
+    event.preventDefault();
 
-    // when someone pressed the "Add user" button first time, show that input form
-    if (userIdInput.type === 'hidden') {
-        userIdInput.type = 'text';
-        userIdInput.focus();
-        event.preventDefault();
-        return;
+    const addedUserId = userIdInput.value;
+    if (isNullOrEmpty(addedUserId)) {
+        throw new Error("User id cannot be empty!");
     }
 
-    const addedUserId = userIdInput.value.trim();
-    if (addedUserId && isUserInChat(addedUserId)) {
+    if (isUserInChat(addedUserId)) {
         notificationElement.style.opacity = '100';
         notificationElement.textContent = 'User is already in the chat.';
 
         setTimeout(function () {
             notificationElement.style.opacity = '0';
         }, 3000);
-        event.preventDefault();
 
-    } else if (addedUserId && !isUserInChat(addedUserId)) {
+    } else {
         userIdInput.value = '';
         userIdInput.type = 'hidden';
-        event.preventDefault();
 
         // send event to the server
         stompClient.send(
@@ -210,4 +217,48 @@ function isUserInChat(userId) {
     return !!chatInfo.participants
         .map(user => user.id.toString())
         .includes(userId);
+}
+
+function createChatEvent(event) {
+    event.preventDefault();
+
+    const chatTitle = chatTitleInput.value.trim();
+    if (isNullOrEmpty(chatTitle)) {
+        throw new Error("Chat title cannot be empty!");
+    }
+
+    sendNewChatRequest({"title": chatTitle}).then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        loadChatList(userId);
+    });
+    // TODO() open created chat
+    chatTitleInput.value = '';
+    chatTitleInput.type = 'hidden';
+}
+
+const sendNewChatRequest = async (chatInfo) => {
+    const response = await fetch('http://localhost:8080/write/new-chat', {
+        headers: {
+            "Content-Type": "application/json",
+            [csrfHeader]: csrfToken
+        },
+        method: "POST",
+        credentials: "same-origin",
+        body: JSON.stringify(chatInfo)
+    });
+    return await response;
+}
+
+function isNullOrEmpty(value) {
+    return value == null || (typeof value === 'string' && value.trim().length === 0);
+}
+
+function revealTextInputField(element) {
+    element.type = 'text';
+}
+
+function hideTextInputField(element) {
+    element.type = 'hidden';
 }

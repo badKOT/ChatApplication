@@ -420,6 +420,31 @@ button.accent {
     margin-right: 10px;
 }
 
+
+/* ### Create Chat Button ### */
+.Button.round {
+    height: 3.375rem;
+    width: 3.375rem;
+    border-radius: 50%;
+}
+div#create-chat-holder {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+}
+#create-chat-icon {
+    font-size: 1.5rem;
+    color: white;
+}
+.icon {
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+}
+
 @media screen and (max-width: 730px) {
 
     .chat-container {

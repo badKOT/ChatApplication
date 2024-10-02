@@ -29,7 +29,7 @@ public class DelegatingService {
     public void addUserToChat(MessageDto messageDto) {
         AccountDto account = accountService.findById(Long.parseLong(messageDto.getContent()));
         if (account == null) {
-            throw new IllegalStateException("User not found with id " + messageDto.getContent());
+            throw new IllegalArgumentException("User not found with id " + messageDto.getContent());
         }
         accountService.addUserToChat(messageDto.getChatId(), account.getId());
         messageDto.setContent(account.getUsername());

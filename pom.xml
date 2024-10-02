@@ -147,14 +147,14 @@
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
 				<version>${jooq.version}</version>
-				<executions>
-					<execution>
+				<!-- <executions> TODO() wanna keep plugin out of lifecycles in local
+					<execution> // should it be in some chain for jenkins or shall I just delete it?
 						<phase>generate-sources</phase>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 					</execution>
-				</executions>
+				</executions> -->
 				<configuration>
 					<jdbc> <!-- db settings go here -->
 						<driver>org.postgresql.Driver</driver>
