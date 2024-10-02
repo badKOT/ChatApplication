@@ -8,6 +8,7 @@ const colors = [
 ];
 
 function loadChatList(userId) {
+    chatListElement.innerHTML = '';
     fetchChatList(userId).then(payload => {
         payload.forEach((chat, index) => {
             onChatReceived(chat, index);
