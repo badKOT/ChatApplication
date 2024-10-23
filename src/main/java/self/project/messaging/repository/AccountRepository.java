@@ -36,11 +36,12 @@ public class AccountRepository {
     }
 
     public List<AccountDto> findByChatId(Long chatId) {
-        return dsl.select(Accounts.ACCOUNTS.ID, Accounts.ACCOUNTS.PHONE_NUMBER, Accounts.ACCOUNTS.USERNAME)
-                .from(Accounts.ACCOUNTS
-                        .join(AccountsChats.ACCOUNTS_CHATS)
-                        .on(Accounts.ACCOUNTS.ID.eq(AccountsChats.ACCOUNTS_CHATS.ACCOUNT_ID)))
-                .where(AccountsChats.ACCOUNTS_CHATS.CHAT_ID.eq(chatId))
+        var A = Accounts.ACCOUNTS;
+        var AC = AccountsChats.ACCOUNTS_CHATS;
+        return dsl.select(A.ID, A.PHONE_NUMBER, A.USERNAME)
+                .from(A.join(AC)
+                        .on(A.ID.eq(AC.ACCOUNT_ID)))
+                .where(AC.CHAT_ID.eq(chatId))
                 .fetchInto(AccountDto.class);
     }
 

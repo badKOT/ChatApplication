@@ -15,16 +15,17 @@ public class MessageRepository {
     private final DSLContext dsl;
 
     public List<MessageDto> findByChatId(Long chatId) {
-        return dsl.selectFrom(Messages.MESSAGES
-                        .join(Accounts.ACCOUNTS)
-                        .on(Accounts.ACCOUNTS.ID.eq(Messages.MESSAGES.ACCOUNT_ID)))
-                .where(Messages.MESSAGES.CHAT_ID.eq(chatId))
+        var M = Messages.MESSAGES;
+        var A = Accounts.ACCOUNTS;
+        return dsl.selectFrom(M.join(A)
+                        .on(A.ID.eq(M.ACCOUNT_ID)))
+                .where(M.CHAT_ID.eq(chatId))
                 .fetch()
                 .map(r -> {
                     var message = r.into(MessageDto.class);
                     message.setSender(new MessageDto.Sender(
-                            r.get(Messages.MESSAGES.ACCOUNT_ID),
-                            r.get(Accounts.ACCOUNTS.USERNAME)));
+                            r.get(M.ACCOUNT_ID),
+                            r.get(A.USERNAME)));
                     return message;
                 });
     }
