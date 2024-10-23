@@ -142,41 +142,28 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<!-- JOOQ Generator Plugin -->
 			<plugin>
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
 				<version>${jooq.version}</version>
-				<!-- <executions> TODO() wanna keep plugin out of lifecycles in local
-					<execution> // should it be in some chain for jenkins or shall I just delete it?
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions> -->
 				<configuration>
-					<jdbc> <!-- db settings go here -->
+					<jdbc>
 						<driver>org.postgresql.Driver</driver>
-						<url>jdbc:postgresql://localhost:5432/ws?currentSchema=flyway</url>
+						<url>jdbc:postgresql://localhost:5432/ws</url>
 						<user>postgres</user>
 						<password>postgres</password>
 					</jdbc>
 					<generator>
 						<database>
-							<includes>.*</includes>  <!-- включаемые подпакеты и файлы -->
-							<excludes>  <!-- исключаемые подпакеты и файлы -->
-								flyway_schema_history
-							</excludes>
-							<inputSchema>flyway</inputSchema>  <!-- схема -->
+							<includes>.*</includes>
+							<excludes>flyway_schema_history</excludes>
+							<inputSchema>flyway</inputSchema>
 						</database>
 						<generate>
 							<records>true</records>
 						</generate>
 						<target>
-							<!-- структура пакетов относительно основной директории -->
 							<packageName>self.project.messaging.model</packageName>
-							<!-- основная директория. Лучше хранить в target. -->
 							<directory>target/generated-sources/jooq</directory>
 						</target>
 					</generator>

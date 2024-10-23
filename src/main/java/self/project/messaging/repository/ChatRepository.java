@@ -17,26 +17,29 @@ public class ChatRepository {
     private final DSLContext dsl;
 
     public Optional<Long> save(NewChatRqDto chat) {
-        return dsl.insertInto(Chats.CHATS)
-                .set(dsl.newRecord(Chats.CHATS, chat))
-                .returning(Chats.CHATS.ID)
+        var C = Chats.CHATS;
+        return dsl.insertInto(C)
+                .set(dsl.newRecord(C, chat))
+                .returning(C.ID)
                 .fetchOptionalInto(ChatShortDto.class)
-                .map(res -> res.getId());
+                .map(ChatShortDto::getId);
     }
 
     public List<ChatShortDto> findByUserId(Long userId) {
-        return dsl.select(Chats.CHATS.ID, Chats.CHATS.TITLE)
-                .from(Chats.CHATS
-                        .join(AccountsChats.ACCOUNTS_CHATS)
-                        .on(Chats.CHATS.ID.eq(AccountsChats.ACCOUNTS_CHATS.CHAT_ID)))
-                .where(AccountsChats.ACCOUNTS_CHATS.ACCOUNT_ID.eq(userId))
+        var C = Chats.CHATS;
+        var AC = AccountsChats.ACCOUNTS_CHATS;
+        return dsl.select(C.ID, C.TITLE)
+                .from(C.join(AC)
+                        .on(C.ID.eq(AC.CHAT_ID)))
+                .where(AC.ACCOUNT_ID.eq(userId))
                 .fetchInto(ChatShortDto.class);
     }
 
     public Optional<ChatShortDto> findByIdShort(Long id) {
-        return dsl.select(Chats.CHATS.ID, Chats.CHATS.TITLE)
-                .from(Chats.CHATS)
-                .where(Chats.CHATS.ID.eq(id))
+        var C = Chats.CHATS;
+        return dsl.select(C.ID, C.TITLE)
+                .from(C)
+                .where(C.ID.eq(id))
                 .fetchOptionalInto(ChatShortDto.class);
     }
 }
