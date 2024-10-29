@@ -18,6 +18,7 @@
 		<java.version>17</java.version>
 		<jooq.version>3.19.11</jooq.version>
 		<flyway.version>10.18.0</flyway.version>
+		<database_url>jdbc:postgresql://localhost:5432/ws</database_url>
 	</properties>
 
 	<dependencies>
@@ -143,13 +144,30 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/jooq</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
 				<version>${jooq.version}</version>
 				<configuration>
 					<jdbc>
 						<driver>org.postgresql.Driver</driver>
-						<url>jdbc:postgresql://localhost:5432/ws</url>
+						<url>${database_url}</url>
 						<user>postgres</user>
 						<password>postgres</password>
 					</jdbc>
@@ -164,7 +182,7 @@
 						</generate>
 						<target>
 							<packageName>self.project.messaging.model</packageName>
-							<directory>target/generated-sources/jooq</directory>
+							<directory>${project.build.directory}/generated-sources/jooq</directory>
 						</target>
 					</generator>
 				</configuration>
@@ -179,9 +197,9 @@
 					<schemas>
 						<schema>flyway</schema>
 					</schemas>
-					<url>jdbc:postgresql://localhost:5432/ws</url>
+					<url>${database_url}</url>
 					<locations>
-						<location>filesystem:src/main/resources/db/migration</location>
+						<location>classpath:/db/migration</location>
 					</locations>
 					<createSchemas>true</createSchemas>
 				</configuration>

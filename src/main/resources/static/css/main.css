@@ -19,12 +19,6 @@ body {
     height: 100%;
 }
 
-.clearfix:after {
-    display: block;
-    content: "";
-    clear: both;
-}
-
 .hidden {
     display: none;
 }
@@ -32,13 +26,6 @@ body {
 section {
     padding: 0;
     margin: 0;
-}
-
-.form-control {
-    width: 100%;
-    min-height: 38px;
-    font-size: 15px;
-    border: 1px solid #c8c8c8;
 }
 
 input {
@@ -80,62 +67,10 @@ button.default {
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
 }
 
-button.primary {
+button.primary, button.accent {
     background-color: #6db33f;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
     color: #fff;
-}
-
-button.accent {
-    background-color: #6db33f;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.12);
-    color: #fff;
-}
-
-.add-user-form-holder {
-    position: relative;
-    float: right;
-}
-
-.notification {
-    display: block;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: #c5e1b2;
-    opacity: 0;
-    color: black;
-    padding: 10px;
-    border-radius: 8px;
-    margin-top: 10px;
-    transition-duration: .5s;
-    transition-property: opacity;
-    z-index: 1;
-}
-
-#username-page {
-    text-align: center;
-}
-
-.username-page-container {
-    background: #fff;
-    box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
-    border-radius: 2px;
-    width: 100%;
-    max-width: 500px;
-    display: inline-block;
-    vertical-align: middle;
-    padding: 35px 55px 35px;
-    min-height: 250px;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    margin: -160px auto 0;
-}
-
-.username-page-container .username-submit {
-    margin-top: 10px;
 }
 
 #chat-page {
@@ -160,16 +95,18 @@ button.accent {
     position: relative;
 }
 
+.chat-container {
+    margin-left: 10px;
+    margin-right: 10px;
+    height: inherit;
+}
+
 .header {
     height: 4rem;
     padding: .375rem .8125rem .5rem .8125rem;
     background-color: #fff;
     box-shadow: 0 1px 11px rgba(0, 0, 0, 0.27);
     z-index: 1;
-}
-
-.ListItem {
-    position: relative;
 }
 
 .chat-list {
@@ -181,12 +118,7 @@ button.accent {
     height: 100%;
     width: 100%;
     position: relative;
-    flex: 1;
     overflow: hidden;
-}
-
-.chat-list .ListItem.chat-item-clickable {
-    margin: 0;
 }
 
 .Avatar {
@@ -207,44 +139,32 @@ button.accent {
     text-transform: uppercase;
 }
 
-.ListItem.chat-item-clickable .Avatar {
+.ListItem .Avatar {
     margin-right: .5rem;
 }
 
-.ListItem.chat-item-clickable .info {
+.ListItem .info {
     flex: 1;
     overflow: hidden;
 }
 
-.ListItem.chat-item-clickable .title {
+.ListItem .title {
     overflow: hidden;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-}
-
-.ListItem .title {
     text-align: initial;
     unicode-bidi: plaintext;
     text-overflow: ellipsis;
-    overflow: hidden;
     line-height: 1.5rem;
 }
 
-.ListItem.chat-item-clickable .ListItem-button {
-    padding: .5625rem;
-}
-
 .Chat {
-    position: absolute;
+    position: relative;
     top: 0;
     left: 0;
     margin: 0;
     width: 100%;
-}
-
-.ListItem-button {
-    cursor: pointer;
 }
 
 .Chat .status {
@@ -252,14 +172,10 @@ button.accent {
     align-self: stretch;
     display: flex;
     align-items: center;
-    z-index: 8;
+    z-index: 2;
 }
 
-.Chat .info {
-    transition: opacity 300ms ease, transform 300ms cubic-bezier(0.33, 1, 0.68, 1);
-}
-
-.ListItem.chat-item-clickable .status {
+.ListItem .status {
     text-align: initial;
     unicode-bidi: plaintext;
     font-size: 1rem;
@@ -268,7 +184,7 @@ button.accent {
     text-overflow: ellipsis;
 }
 
-.ListItem .ListItem-button {
+.ListItem-button {
     width: 100%;
     height: 100%;
     background-color: #fff;
@@ -277,7 +193,7 @@ button.accent {
     outline: none !important;
     display: flex;
     align-items: center;
-    padding: 1rem;
+    padding: .5625rem;
     position: relative;
     overflow: hidden;
     white-space: nowrap;
@@ -285,56 +201,88 @@ button.accent {
     border-radius: 0.75rem;
     --ripple-color: rgba(0, 0, 0, 0.08);
     text-decoration: none;
+    cursor: pointer;
 }
 
-#chat-page ul {
+.ListItem .ListItem-button:hover {
+    background-color: #eee;
+}
+
+ul {
     list-style-type: none;
     background-color: #FFF;
     margin: 0;
     overflow: auto;
-    overflow-y: scroll;
-    padding: 0 20px 0 20px;
-    height: calc(100% - 150px);
+    padding: 0;
 }
 
-#chat-page #messageForm {
-    padding: 1rem;
-    position: absolute;
-    bottom: 0;
+/* ### Chat Header Styles ### */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #d8d8d8;
+    height: 4rem;
+    z-index: 3;
+    position: relative;
+    background-color: #f4f4f4;
+}
+.chat-header h2 {
+    margin: 0;
+    font-weight: 500;
+}
+.connecting {
+    padding: 0;
+    text-align: center;
+    align-content: center;
+    color: #777;
+    position: relative;
     width: 100%;
-    background-color: white;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #d8d8d8;
+    height: 36px;
+    transition-property: height, top;
+    transition-duration: .3s;
+    transition-timing-function: ease-out;
+    top: 0;
+    z-index: 1;
+}
+.connecting.disabled {
+    top: -36px;
+    height: 0;
 }
 
-#chat-page ul li {
+/* ### Message Styles ### */
+#messageArea {
+    padding: 0 20px 0 20px;
+    height: calc(100% - 134px);
+}
+#messageArea li {
     line-height: 1.5rem;
     padding: 10px 0;
     margin: 0;
-    border-bottom: 1px solid #f4f4f4;
+    border-bottom: 1px solid #d8d8d8;
 }
-
-#chat-page ul li p {
+#messageArea li p {
     margin: 0;
 }
 
-#chat-page .event-message {
+#messageArea .event-message {
     width: 100%;
     text-align: center;
     clear: both;
 }
-
-#chat-page .event-message p {
+#messageArea .event-message p {
     color: #777;
     font-size: 14px;
     word-wrap: break-word;
 }
 
-#chat-page .chat-message {
+#messageArea .chat-message {
     position: relative;
     display: flex;
 }
-
-#chat-page .chat-message i {
+#messageArea .chat-message i {
     width: 42px;
     height: 42px;
     overflow: hidden;
@@ -354,14 +302,12 @@ button.accent {
     font-weight: 600;
     margin-bottom: 8px;
 }
-
 .message-wrapper p {
     color: #43464b;
     word-wrap: break-word;
     width: 100%;
     flex-grow: 1;
 }
-
 .message-wrapper .message-time {
     color: #999;
     font-size: 12px;
@@ -369,7 +315,6 @@ button.accent {
     top: 0;
     right: 0;
 }
-
 .message-wrapper {
     margin-left: 16px;
     position: relative;
@@ -377,49 +322,46 @@ button.accent {
     flex-direction: column;
     flex: 1;
 }
+/* ### Message Styles ###*/
 
-#messageForm .input-group input {
-    float: left;
-    width: calc(100% - 85px);
+#messageForm {
+    padding: 1rem;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
-#messageForm .input-group button {
+#messageForm input {
+    float: left;
+    width: calc(100% - 85px);
+    min-height: 38px;
+    font-size: 15px;
+    border: 1px solid #c8c8c8;
+}
+
+#messageForm button {
     float: left;
     width: 80px;
     height: 38px;
     margin-left: 5px;
 }
 
-.chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    border-bottom: 1px solid #ececec;
-    height: 4rem;
+.notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background-color: white;
+    opacity: 0;
+    color: black;
+    padding: 10px;
+    border-radius: 8px;
+    transition-duration: .5s;
+    transition-property: opacity;
+    z-index: 3;
+    border: 1px solid;
 }
-
-.chat-header h2 {
-    margin: 0;
-    font-weight: 500;
-    flex: 1;
-    text-align: left;
-}
-
-.connecting {
-    padding-top: 5px;
-    text-align: center;
-    color: #777;
-    position: absolute;
-    top: 65px;
-    width: 100%;
-}
-
-.chat-container {
-    margin-left: 10px; /*TODO() убрать, но сейчас сливается с левым меню*/
-    margin-right: 10px;
-}
-
 
 /* ### Create Chat Button ### */
 .Button.round {
@@ -427,7 +369,7 @@ button.accent {
     width: 3.375rem;
     border-radius: 50%;
 }
-div#create-chat-holder {
+#create-chat-holder {
     position: absolute;
     right: 1rem;
     bottom: 1rem;
@@ -443,6 +385,57 @@ div#create-chat-holder {
     font-variant: normal;
     text-transform: none;
     line-height: 1;
+}
+
+/* ### Add User Form ### */
+#overlay {
+    position: fixed;
+    display: none;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+
+#addUserForm {
+    position: relative; /* for input container to be positioned properly */
+    z-index: 3;
+}
+
+.input-container {
+    position: absolute;
+    top: 0;
+    left: -200px;
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+}
+#username-input-field {
+    padding: 8px;
+}
+#userListPlaceHolder {
+    display: none;
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 80px;
+    overflow-y: auto;
+}
+.account-avatar {
+    width: 36px;
+    padding: 8px;
+}
+.account-info-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.account-in-chat-flag {
+    font-size: 12px;
+    color: #444;
+    text-transform: uppercase;
 }
 
 @media screen and (max-width: 730px) {
@@ -468,11 +461,11 @@ div#create-chat-holder {
         height: calc(100% - 120px);
     }
 
-    #messageForm .input-group button {
+    #messageForm button {
         width: 65px;
     }
 
-    #messageForm .input-group input {
+    #messageForm input {
         width: calc(100% - 70px);
     }
 

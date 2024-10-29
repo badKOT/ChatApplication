@@ -42,4 +42,9 @@ public class ChatRepository {
                 .where(C.ID.eq(id))
                 .fetchOptionalInto(ChatShortDto.class);
     }
+
+    public List<ChatShortDto> findByUserIdSorted(Long userId) {
+        String query = "select c.* from accounts_chats ac join (select chat_id, MAX(sent) as sent from messages group by chat_id) as m on ac.chat_id = m.chat_id and ac.account_id = " + userId + " join chats c on c.id = ac.chat_id order by sent desc nulls last;";
+        return dsl.fetch(query).into(ChatShortDto.class);
+    }
 }

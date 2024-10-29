@@ -3,6 +3,7 @@ package self.project.messaging.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import self.project.messaging.dto.AccountDto;
+import self.project.messaging.dto.AddUserToChatDto;
 import self.project.messaging.dto.ChatFullDto;
 import self.project.messaging.dto.ChatShortDto;
 import self.project.messaging.dto.MessageDto;
@@ -28,26 +29,26 @@ public class DelegatingService {
         return new ChatFullDto(chatDto, participants, messageList);
     }
 
-    public void addUserToChat(MessageDto messageDto) {
-        AccountDto account = accountService.findById(Long.parseLong(messageDto.getContent()));
-        if (account == null) {
-            throw new IllegalArgumentException("User not found with id " + messageDto.getContent());
-        }
-        accountService.addUserToChat(messageDto.getChatId(), account.getId());
-        messageDto.setContent(account.getUsername());
-        messageService.save(messageDto);
-    }
-
-    public void createChat(NewChatRqDto dto, String username) {
+    public Long createChat(NewChatRqDto dto, String username) {
         var chatId = chatService.save(dto);
 
         var account = accountService.findByUsername(username);
+        var addUserToChatDto = new AddUserToChatDto(account.getId(), chatId, account.getId());
+        addUserToChat(addUserToChatDto);
+        return chatId;
+    }
+
+    public MessageDto addUserToChat(AddUserToChatDto dto) {
+        var account = accountService.findById(dto.userToAddId());
+        var initiator = accountService.findById(dto.initiatorId());
+        accountService.addUserToChat(dto.chatId(), dto.userToAddId());
         var messageDto = new MessageDto(
-                            account.getId().toString(),
-                            new Sender(account.getId(), username),
+                            account.getUsername(),
+                            new Sender(dto.initiatorId(), initiator.getUsername()),
                             MessageType.JOIN,
                             Instant.now(),
-                            chatId);
-        addUserToChat(messageDto);
+                            dto.chatId());
+        messageService.save(messageDto);
+        return messageDto;
     }
 }

@@ -1,29 +1,33 @@
 'use strict';
 
-const csrfToken = document.querySelector('meta[name="_csrf"]').content;
-const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
-
-const messageForm = document.querySelector('#messageForm');
 const messageInput = document.querySelector('#message');
 const messageArea = document.querySelector('#messageArea');
-const connectingElement = document.querySelector('.connecting');
+const chatStatusBar = document.querySelector('.connecting');
 const chatHeader = document.querySelector('.chat-header h2');
-const addUserFormHolder = document.querySelector('.add-user-form-holder');
-const addUserForm = document.querySelector('#addUserForm');
-const userIdInput = document.querySelector('#userId_addUserForm');
+const usernameInput = document.querySelector('#username-input-field');
 const notificationElement = document.querySelector('#notification');
 const chatPageSection = document.querySelector('#chat-page');
-const createChatButton = document.querySelector('#create-chat-form button');
 const chatTitleInput = document.querySelector('#create-chat-title');
 const createChatHolder = document.querySelector('#create-chat-holder');
+const overlay = document.querySelector('#overlay');
+const userListPlaceHolder = document.querySelector('#userListPlaceHolder');
+const userList = document.querySelector('#userList');
 
-messageForm.addEventListener('submit', sendMessage, true);
-addUserForm.addEventListener('submit', addUser, true);
-createChatButton.onclick = ((event) => createChatEvent(event));
-createChatHolder.addEventListener('mouseenter', () => revealTextInputField(chatTitleInput));
-createChatHolder.addEventListener('mouseleave', () => hideTextInputField(chatTitleInput));
-addUserFormHolder.addEventListener('mouseenter', () => revealTextInputField(userIdInput));
-addUserFormHolder.addEventListener('mouseleave', () => hideTextInputField(userIdInput));
+let timeout;
+usernameInput.addEventListener('input', function() {
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+        userList.style.display = 'none';
+        userListPlaceHolder.style.display = 'block';
+        checkAddUserInput();
+    }, 1000);
+});
+createChatHolder.addEventListener('mouseenter', () => chatTitleInput.type = 'text');
+createChatHolder.addEventListener('mouseleave', () => chatTitleInput.type = 'hidden');
+overlay.addEventListener('click', () => hideAddUserAction());
+document.querySelector('#messageForm').addEventListener('submit', sendMessage, true);
+document.querySelector('#addUserForm').addEventListener('submit', addUser, true);
+document.querySelector('#create-chat-form button').onclick = ((event) => createChatEvent(event));
 
 let stompClient = null;
 
@@ -34,17 +38,14 @@ function connect(chat_info) {
     if (chatPageSection.style.display === 'block') {
         chatHeader.innerText = '';
         messageArea.innerHTML = '';
-        connectingElement.classList.remove('hidden');
+        chatStatusBar.classList.remove('disabled');
     }
 
     const socket = new SockJS('/ws');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, onConnect, onError);
     chatPageSection.style.display = 'block';
-    loadChatHeader()
-}
 
-function loadChatHeader() {
     chatHeader.innerText = chatInfo.title;
     // TODO() add chat info like participants and stuff
 }
@@ -53,7 +54,7 @@ function onConnect() {
     // subscribe to the public topic
     stompClient.subscribe('/topic/chat/' + chatInfo.id, onMessageReceived);
 
-    connectingElement.classList.add('hidden')
+    chatStatusBar.classList.add('disabled');
     let messageList = chatInfo.messageList;
     for (let i = 0; i < messageList.length; i++) {
         onMessageReceived(messageList[i], false, true);
@@ -61,7 +62,6 @@ function onConnect() {
 }
 
 function onMessageReceived(payload, removeHeaders = true, adjustTimeFormat = false) {
-
     const message = removeHeaders ? JSON.parse(payload.body) : payload;
     let messageElement = document.createElement('li');
 
@@ -70,20 +70,11 @@ function onMessageReceived(payload, removeHeaders = true, adjustTimeFormat = fal
 
         let avatarElement = prepareAvatarElement(message.sender);
         let messageWrapper = prepareChatMessageElement(message, adjustTimeFormat);
-
         messageElement.appendChild(avatarElement);
         messageElement.appendChild(messageWrapper);
-
     } else {
         messageElement.classList.add('event-message');
-
-        if (message.type === 'JOIN') {
-            message.content = message.content + ' joined!';
-        } else {
-            message.content = message.sender + ' left!';
-        }
-
-        let textElement = prepareTextElement(message.content);
+        let textElement = prepareTextElement(message.content + ' joined!');
         messageElement.appendChild(textElement);
     }
 
@@ -92,19 +83,17 @@ function onMessageReceived(payload, removeHeaders = true, adjustTimeFormat = fal
 }
 
 function onError() {
-    connectingElement.textContent = 'Could not connect to WebSocket server'
-    connectingElement.classList.remove('hidden');
-    connectingElement.style.color = 'red';
+    chatStatusBar.textContent = 'Could not connect to WebSocket server. Please, reload the page';
+    chatStatusBar.classList.remove('disabled');
+    chatStatusBar.style.color = 'red';
 }
 
 function prepareAvatarElement(sender) {
     let avatarElement = document.createElement('i');
-    let avatarText = document.createTextNode(sender.username[0]);
-    avatarElement.appendChild(avatarText);
+    avatarElement.innerText = sender.username[0];
     avatarElement.style.backgroundColor = getAvatarColor(sender.username);
     return avatarElement;
 }
-
 function prepareChatMessageElement(message, adjustTimeFormat) {
     let usernameElement = prepareUsernameElement(message.sender.username);
     let textElement = prepareTextElement(message.content);
@@ -118,39 +107,31 @@ function prepareChatMessageElement(message, adjustTimeFormat) {
 
     return messageWrapper;
 }
-
 function prepareUsernameElement(sender) {
     let usernameElement = document.createElement('span');
-    let usernameText = document.createTextNode(sender);
-    usernameElement.appendChild(usernameText);
+    usernameElement.innerText = sender;
     return usernameElement;
 }
-
 function prepareTextElement(content) {
     let textElement = document.createElement('p');
-    let messageText = document.createTextNode(content);
-    textElement.appendChild(messageText);
+    textElement.innerText = content;
     return textElement;
 }
-
 function prepareTimeElement(timestamp, adjustTimeFormat) {
     let timeElement = document.createElement('span');
     timeElement.classList.add('message-time');
     const date = adjustTimeFormat ? new Date(timestamp * 1000) : new Date(timestamp);
-    let timeText = document.createTextNode(date.toISOString());
-    timeElement.appendChild(timeText);
+    timeElement.innerText = date.toISOString();
     return timeElement;
 }
 
 function sendMessage(event) {
+    event.preventDefault();
     const messageContent = messageInput.value.trim();
-    if (messageContent && stompClient) {
 
+    if (messageContent && stompClient) {
         const chatMessage = {
-            sender: {
-                id: Number(userId),
-                username: username
-            },
+            sender: {id: Number(userId), username: username},
             content: messageContent,
             type: 'CHAT',
             sent: new Date(Date.now()).toISOString(),
@@ -163,60 +144,11 @@ function sendMessage(event) {
         );
         messageInput.value = '';
     }
-    event.preventDefault();
-}
-
-function getAvatarColor(messageSender) {
-    let hash = 0;
-    for (let i = 0; i < messageSender.length; i++) {
-        hash = 31 * hash + messageSender.charCodeAt(i);
-    }
-    const index = Math.abs(hash % colors.length);
-    return colors[index];
 }
 
 function addUser(event) {
     event.preventDefault();
-
-    const addedUserId = userIdInput.value;
-    if (isNullOrEmpty(addedUserId)) {
-        throw new Error("User id cannot be empty!");
-    }
-
-    if (isUserInChat(addedUserId)) {
-        notificationElement.style.opacity = '100';
-        notificationElement.textContent = 'User is already in the chat.';
-
-        setTimeout(function () {
-            notificationElement.style.opacity = '0';
-        }, 3000);
-
-    } else {
-        userIdInput.value = '';
-        userIdInput.type = 'hidden';
-
-        // send event to the server
-        stompClient.send(
-            '/app/chat.addUser',
-            {},
-            JSON.stringify({
-                sender: {
-                    id: Number(userId),
-                    username: username
-                },
-                type: 'JOIN',
-                sent: new Date(Date.now()).toISOString(),
-                chatId: chatInfo.id,
-                content: addedUserId
-            })
-        );
-    }
-}
-
-function isUserInChat(userId) {
-    return !!chatInfo.participants
-        .map(user => user.id.toString())
-        .includes(userId);
+    usernameInput.type === 'hidden' ? triggerAddUserAction() : hideAddUserAction();
 }
 
 function createChatEvent(event) {
@@ -227,38 +159,114 @@ function createChatEvent(event) {
         throw new Error("Chat title cannot be empty!");
     }
 
-    sendNewChatRequest({"title": chatTitle}).then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        loadChatList(userId);
+    sendNewChatRequest({"title": chatTitle})
+        .then(response => response.text())
+        .then(newChatId => {
+            loadChatList(userId);
+            window.history.replaceState(null, null, `/chats/${newChatId}`);
+            fetchChatInfo(newChatId)
+                .then(payload => connect(payload));
     });
-    // TODO() open created chat
     chatTitleInput.value = '';
     chatTitleInput.type = 'hidden';
 }
 
-const sendNewChatRequest = async (chatInfo) => {
-    const response = await fetch('http://localhost:8080/write/new-chat', {
-        headers: {
-            "Content-Type": "application/json",
-            [csrfHeader]: csrfToken
-        },
-        method: "POST",
-        credentials: "same-origin",
-        body: JSON.stringify(chatInfo)
+function triggerAddUserAction() {
+    overlay.style.display = 'block';
+    usernameInput.type = 'text';
+    userListPlaceHolder.style.display = 'block';
+    checkAddUserInput();
+}
+function hideAddUserAction() {
+    overlay.style.display = 'none';
+    usernameInput.type = 'hidden';
+    userListPlaceHolder.style.display = 'none';
+    userList.style.display = 'none';
+}
+function checkAddUserInput() {
+    if (isNullOrEmpty(usernameInput.value) || usernameInput.value.trim().length < 3) {
+        renderUserListPlaceHolderWithMessage('Start typing...');
+    } else {
+        renderUserListPlaceHolderWithMessage('Just a second...');
+        searchByUsername(usernameInput.value.trim())
+            .then(payload => renderSearchResults(payload));
+    }
+}
+
+function renderUserListPlaceHolderWithMessage(text) {
+    userListPlaceHolder.innerHTML = '';
+    const message = document.createElement('p');
+    message.style.textAlign = 'center';
+    message.innerText = text;
+    userListPlaceHolder.appendChild(message);
+}
+
+function renderSearchResults(accounts) {
+    userListPlaceHolder.innerHTML = '';
+    if (accounts.length === 0) {
+        renderUserListPlaceHolderWithMessage('No users found');
+        return;
+    }
+    userList.innerHTML = '';
+    userListPlaceHolder.style.display = 'none';
+    userList.style.display = 'block';
+    accounts.forEach((acc) => {
+        userList.appendChild(renderAccount(acc));
     });
-    return await response;
 }
 
-function isNullOrEmpty(value) {
-    return value == null || (typeof value === 'string' && value.trim().length === 0);
+function renderAccount(account) {
+    const searchResultItem = document.createElement('li');
+    let buttonElement = prepareAccountButtonElement(account);
+    searchResultItem.appendChild(buttonElement);
+    return searchResultItem;
 }
 
-function revealTextInputField(element) {
-    element.type = 'text';
+function prepareAccountButtonElement(account) {
+    const buttonElement = document.createElement('a');
+    const accountAvatar = document.createElement('div');
+    const accountInfoWrapper = prepareAccountInfoWrapperElement(account);
+
+    buttonElement.role = 'button';
+    buttonElement.classList.add('ListItem-button');
+    accountAvatar.classList.add('account-avatar');
+
+    buttonElement.appendChild(accountAvatar);
+    buttonElement.appendChild(accountInfoWrapper);
+    buttonElement.onclick = (event) => {
+        event.preventDefault();
+        if (isUserInChat(account.id)) {
+            notificationElement.style.opacity = '100';
+            notificationElement.textContent = `User ${account.username} is already in the chat!`;
+
+            setTimeout(function () {
+                notificationElement.style.opacity = '0';
+            }, 3000);
+            return;
+        }
+        addUserToChat(account.id, chatInfo.id, userId)
+            .then(() => {
+                hideAddUserAction();
+                usernameInput.value = '';
+                fetchChatInfo(chatInfo.id);
+            });
+    };
+    return buttonElement;
 }
 
-function hideTextInputField(element) {
-    element.type = 'hidden';
+function prepareAccountInfoWrapperElement(account) {
+    const accountInfoWrapper = document.createElement('div');
+    const accountUsername = document.createElement('span');
+    const accountInChatFlag = document.createElement('span');
+
+    accountInfoWrapper.classList.add('account-info-wrapper');
+    accountUsername.innerText = account.username;
+    if (isUserInChat(account.id)) {
+        accountInChatFlag.innerText = 'in chat';
+        accountInChatFlag.classList.add('account-in-chat-flag');
+    }
+
+    accountInfoWrapper.appendChild(accountUsername);
+    accountInfoWrapper.appendChild(accountInChatFlag);
+    return accountInfoWrapper;
 }

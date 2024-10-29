@@ -35,6 +35,13 @@ public class AccountRepository {
                 .fetchOptionalInto(AccountFullDto.class);
     }
 
+    public List<AccountDto> findByUsernameStartingWith(String username) {
+        return dsl.selectFrom(Accounts.ACCOUNTS)
+                .where(Accounts.ACCOUNTS.USERNAME.like("%" + username + "%")) // returns any account which username contains specified argument
+                .limit(20)
+                .fetchInto(AccountDto.class);
+    }
+
     public List<AccountDto> findByChatId(Long chatId) {
         var A = Accounts.ACCOUNTS;
         var AC = AccountsChats.ACCOUNTS_CHATS;
