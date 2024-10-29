@@ -29,6 +29,10 @@ public class AccountService {
                 new NoSuchElementException("Account with username " + username + " not found"));
     }
 
+    public List<AccountDto> findByUsernameStartingWith(String username) {
+        return repository.findByUsernameStartingWith(username);
+    }
+
     public List<AccountDto> findByChatId(Long chatId) {
         return repository.findByChatId(chatId);
     }

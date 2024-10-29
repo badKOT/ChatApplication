@@ -27,4 +27,8 @@ public class ChatService {
     public List<ChatShortDto> findForUser(Long userId) {
         return repository.findByUserId(userId);
     }
+
+    public List<ChatShortDto> findForUserSorted(Long userId) {
+        return repository.findByUserIdSorted(userId);
+    }
 }
